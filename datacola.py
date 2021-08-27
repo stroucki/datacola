@@ -165,9 +165,9 @@ gotdiskprevdata = False
 diskprevline = ""
 
 if os.path.isfile(diskprevfilename):
-   with open(diskprevfilename, "r", encoding='utf-8') as fh:
-       diskprevline = fh.read()
-       gotdiskprevdata = True
+    with open(diskprevfilename, "r", encoding='utf-8') as fh:
+        diskprevline = fh.read()
+        gotdiskprevdata = True
 
 if gotdiskprevdata:
     diskprevdata = [int(x) for x in diskprevline.split()]
