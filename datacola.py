@@ -161,12 +161,11 @@ currdiskreadc, currdiskreads, currdiskreadt, \
     currdiskioq = (0, 0, 0, 0, 0, 0, 0)
 
 for line in lines:
-    major, minor, name, data = line.split(maxsplit = 4)
+    major, minor, name, data1 = line.split(maxsplit = 4)
     diskreadc, diskreadm, diskreads, diskreadt, \
         diskwritec, diskwritem, diskwrites, diskwritet, \
         diskioq, diskiot, diskiotw, \
-        _, _, _, _ = [int(x) for x in data.split()]
-    del data
+        _, _, _, _ = [int(x) for x in data1.split()]
 
     # I think empty 4 least significant bits signify whole-disk
     if int(minor) & 15 == 0:
@@ -191,7 +190,7 @@ if os.path.isfile(diskprevfilename):
 
         prevdiskreadc, prevdiskreads, prevdiskreadt, \
             prevdiskwritec, prevdiskwrites, prevdiskwritet, \
-            prevdiskioq = [int(x) for x in diskprevdata]
+            prevdiskioq = diskprevdata
         gotdiskprevdata = True
 
     except:
