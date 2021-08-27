@@ -47,20 +47,13 @@ bufsize = 0
 
 if os.path.exists(bufsizefilename):
     if os.path.isfile(bufsizefilename):
-        try:
-            bufsizefile = open(bufsizefilename, 'r')
+        with open(bufsizefilename, "r", encoding='utf-8') as bufsizefile:
             bufsize = int(bufsizefile.read())
-            bufsizefile.close()
-        except:
-            pass
-    else:
-        raise
 
 if bufsize == 0:
     bufsize = random.randint(20, 30)
-    bufsizefile = open(bufsizefilename, 'w')
-    bufsizefile.write(str(bufsize))
-    bufsizefile.close()
+    with open(bufsizefilename, 'w', encoding='utf-8') as bufsizefile:
+        bufsizefile.write(str(bufsize))
 
 # obtain timestamp.
 now = int(time.time())
@@ -72,9 +65,8 @@ hostname = platform.node()
 storagefilename = "%s/%s" % (storagefilebase, hostname)
 
 # obtain load1 and number of processes
-fh = open(loadavgfilename, 'r')
-loadavgline = fh.read()
-fh.close()
+with open(loadavgfilename, "r", encoding='utf-8') as fh:
+    loadavgline = fh.read()
 
 loadavgdata = loadavgline.split()
 load1 = loadavgdata[0]
@@ -92,9 +84,8 @@ loadavgout = "AN %s %s" % (load1, totalprocs)
 # counting of tuntap and bridge interfaces. though inter-host traffic is
 # not counted this way.
 
-fh = open(netfilename, 'r')
-lines = fh.readlines()
-fh.close()
+with open(netfilename, "r", encoding='utf-8') as fh:
+    lines = fh.readlines()
 
 (currrxp, currtxp, currrxb, currtxb) = (0, 0, 0, 0)
 for line in lines[2:]:
@@ -110,22 +101,16 @@ for line in lines[2:]:
 gotnetprevdata = False
 
 if os.path.isfile(netprevfilename):
-    try:
-        fh = open(netprevfilename, "r")
+    with open(netprevfilename, "r", encoding='utf-8') as fh:
         netprevline = fh.read()
-        fh.close()
 
-        netprevdata = [int(x) for x in netprevline.split()]
-        prevrxb, prevrxp, prevtxb, prevtxp = netprevdata
-        gotnetprevdata = True
-    except:
-        os.unlink(netprevfilename)
+    netprevdata = [int(x) for x in netprevline.split()]
+    prevrxb, prevrxp, prevtxb, prevtxp = netprevdata
+    gotnetprevdata = True
 
-
-if gotnetprevdata == True:
-    fh = open(netprevfilename, "w")
-    fh.write("%s %s %s %s" % (currrxb, currrxp, currtxb, currtxp))
-    fh.close()
+if gotnetprevdata:
+    with open(netprevfilename, "w", encoding='utf-8') as fh:
+        fh.write("%s %s %s %s" % (currrxb, currrxp, currtxb, currtxp))
 
     rxb = nonneg(currrxb - prevrxb)
     rxp = nonneg(currrxp - prevrxp)
@@ -133,9 +118,8 @@ if gotnetprevdata == True:
     txp = nonneg(currtxp - prevtxp)
 
 else:
-    fh = open(netprevfilename, "w")
-    fh.write("%s %s %s %s" % (currrxb, currrxp, currtxb, currtxp))
-    fh.close()
+    with open(netprevfilename, "w", encoding='utf-8') as fh:
+        fh.write("%s %s %s %s" % (currrxb, currrxp, currtxb, currtxp))
 
     rxb, rxp, txb, txp = (0, 0, 0, 0)
 
@@ -152,9 +136,8 @@ netdata = "NET %s %s %s %s" % (rxb, txb, rxp, txp)
 # diskioq: Count of items in disk IO queue
 # values are summed over whole disk devices (lower 4 bits of minor == 0).
 # this should avoid double-counting of partitions.
-fh = open(diskfilename, 'r')
-lines = fh.readlines()
-fh.close()
+with open(diskfilename, "r", encoding='utf-8') as fh:
+    lines = fh.readlines()
 
 currdiskreadc, currdiskreads, currdiskreadt, \
     currdiskwritec, currdiskwrites, currdiskwritet, \
@@ -182,9 +165,8 @@ gotdiskprevdata = False
 
 if os.path.isfile(diskprevfilename):
     try:
-        fh = open(diskprevfilename, "r")
-        diskprevline = fh.read()
-        fh.close()
+        with open(diskprevfilename, "r", encoding='utf-8') as fh:
+            diskprevline = fh.read()
 
         diskprevdata = [int(x) for x in diskprevline.split()]
 
@@ -197,8 +179,8 @@ if os.path.isfile(diskprevfilename):
         os.unlink(diskprevfilename)
 
 if gotdiskprevdata == True:
-    fh = open(diskprevfilename, "w")
-    fh.write("%s %s %s %s %s %s %s" % \
+    with open(diskprevfilename, "w", encoding='utf-8') as fh:
+        fh.write("%s %s %s %s %s %s %s" % \
                  (currdiskreadc, currdiskreads, currdiskreadt,
                   currdiskwritec, currdiskwrites, currdiskwritet,
                   currdiskioq))
@@ -215,12 +197,11 @@ if gotdiskprevdata == True:
     diskioq = currdiskioq - prevdiskioq
 
 else:
-    fh = open(diskprevfilename, "w")
-    fh.write("%s %s %s %s %s %s %s" % \
+    with open(diskprevfilename, "w", encoding='utf-8') as fh:
+        fh.write("%s %s %s %s %s %s %s" % \
                  (currdiskreadc, currdiskreads, currdiskreadt,
                   currdiskwritec, currdiskwrites, currdiskwritet,
                   currdiskioq))
-    fh.close()
 
     diskreadc, diskreads, diskreadt, diskwritec, diskwrites, diskwritet, diskioq = (0, 0, 0, 0, 0, 0, 0)
 
@@ -231,9 +212,8 @@ diskdata = "DISK %s %s %s %s %s %s %s" % \
 
 # obtain memory data
 # free memory = MemTotal - MemFree - Buffers - Cached
-fh = open("/proc/meminfo", "r")
-lines = fh.readlines()
-fh.close()
+with open("/proc/meminfo", "r", encoding='utf-8') as fh:
+    lines = fh.readlines()
 
 core = 0
 for line in lines:
@@ -262,31 +242,23 @@ dataline = "host %s dat %s %s %s %s %s %s END\n" % (hostname, now, loadavgout, n
 # read in the buffer of data rows
 linecount = 0
 if os.path.isfile(bufferfilename):
-    fh = open(bufferfilename, "r")
-    lines = fh.readlines();
-    fh.close()
+    with open(bufferfilename, "r", encoding='utf-8') as fh:
+        lines = fh.readlines();
     linecount = len(lines)
 
 # if the new data row would put it over the limit of lines to buffer,
 # append the data to the archive file and truncate the buffer file
 if linecount > bufsize:
-    try:
-        fh = open(storagefilename, "a")
+    with open(storagefilename, "a", encoding='utf-8') as fh:
         for line in lines:
             fh.write(line)
 
         fh.write(dataline)
-        fh.close()
-            
-        fh = open(bufferfilename, "w")
-        fh.close()
-    except:
-        raise
+
+    with open(bufferfilename, "w", encoding='utf-8') as fh:
+        pass
+
 # otherwise add the data to the buffer file
 else:
-    try:
-        fh = open(bufferfilename, "a")
+    with open(bufferfilename, "a", encoding='utf-8') as fh:
         fh.write(dataline)
-        fh.close()
-    except:
-        raise
