@@ -99,16 +99,16 @@ for line in lines[2:]:
 
 # try to read previous values
 gotnetprevdata = False
+netprevline = ""
 
 if os.path.isfile(netprevfilename):
     with open(netprevfilename, "r", encoding='utf-8') as fh:
         netprevline = fh.read()
-
-    netprevdata = [int(x) for x in netprevline.split()]
-    prevrxb, prevrxp, prevtxb, prevtxp = netprevdata
-    gotnetprevdata = True
+        gotnetprevdata = True
 
 if gotnetprevdata:
+    netprevdata = [int(x) for x in netprevline.split()]
+    prevrxb, prevrxp, prevtxb, prevtxp = netprevdata
     with open(netprevfilename, "w", encoding='utf-8') as fh:
         fh.write("%s %s %s %s" % (currrxb, currrxp, currtxb, currtxp))
 
@@ -162,29 +162,25 @@ for line in lines:
 
 # try to read previous values
 gotdiskprevdata = False
+diskprevline = ""
 
 if os.path.isfile(diskprevfilename):
-    try:
-        with open(diskprevfilename, "r", encoding='utf-8') as fh:
-            diskprevline = fh.read()
+   with open(diskprevfilename, "r", encoding='utf-8') as fh:
+       diskprevline = fh.read()
+       gotdiskprevdata = True
 
-        diskprevdata = [int(x) for x in diskprevline.split()]
+if gotdiskprevdata:
+    diskprevdata = [int(x) for x in diskprevline.split()]
 
-        prevdiskreadc, prevdiskreads, prevdiskreadt, \
-            prevdiskwritec, prevdiskwrites, prevdiskwritet, \
-            prevdiskioq = diskprevdata
-        gotdiskprevdata = True
+    prevdiskreadc, prevdiskreads, prevdiskreadt, \
+        prevdiskwritec, prevdiskwrites, prevdiskwritet, \
+        prevdiskioq = diskprevdata
 
-    except:
-        os.unlink(diskprevfilename)
-
-if gotdiskprevdata == True:
     with open(diskprevfilename, "w", encoding='utf-8') as fh:
         fh.write("%s %s %s %s %s %s %s" % \
                  (currdiskreadc, currdiskreads, currdiskreadt,
                   currdiskwritec, currdiskwrites, currdiskwritet,
                   currdiskioq))
-    fh.close()
 
     diskreadc = nonneg(currdiskreadc - prevdiskreadc)
     diskreads = nonneg(currdiskreads - prevdiskreads)
@@ -203,7 +199,8 @@ else:
                   currdiskwritec, currdiskwrites, currdiskwritet,
                   currdiskioq))
 
-    diskreadc, diskreads, diskreadt, diskwritec, diskwrites, diskwritet, diskioq = (0, 0, 0, 0, 0, 0, 0)
+    diskreadc, diskreads, diskreadt, diskwritec,\
+        diskwrites, diskwritet, diskioq = (0, 0, 0, 0, 0, 0, 0)
 
 diskdata = "DISK %s %s %s %s %s %s %s" % \
     (diskreadc, diskreads, diskreadt,
@@ -230,20 +227,23 @@ for line in lines:
 memdata = "CORE %s" % (core)
 
 # obtain count of logged in uses. Unfortunately I have to fork processes here
-users = subprocess.Popen(["/usr/bin/who", "-q"], stdout=subprocess.PIPE).communicate()[0]
-usersdata = users.decode('utf8').strip().split()
-userscount = usersdata[-1].split("=")[1]
+userscount = 0
+with subprocess.Popen(["/usr/bin/who", "-q"], stdout=subprocess.PIPE) as proc:
+    users = proc.stdout.read()
+    usersdata = users.decode('utf8').strip().split()
+    userscount = usersdata[-1].split("=")[1]
 
 userdata = "US %s" % (userscount)
 
 # generate this row of data
-dataline = "host %s dat %s %s %s %s %s %s END\n" % (hostname, now, loadavgout, netdata, diskdata, memdata, userdata)
+dataline = "host %s dat %s %s %s %s %s %s END\n" % \
+    (hostname, now, loadavgout, netdata, diskdata, memdata, userdata)
 
 # read in the buffer of data rows
 linecount = 0
 if os.path.isfile(bufferfilename):
     with open(bufferfilename, "r", encoding='utf-8') as fh:
-        lines = fh.readlines();
+        lines = fh.readlines()
     linecount = len(lines)
 
 # if the new data row would put it over the limit of lines to buffer,
