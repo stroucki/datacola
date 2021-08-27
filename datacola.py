@@ -73,10 +73,10 @@ storagefilename = "%s/%s" % (storagefilebase, hostname)
 
 # obtain load1 and number of processes
 fh = open(loadavgfilename, 'r')
-loadavgdata = fh.read()
+loadavgline = fh.read()
 fh.close()
 
-loadavgdata = loadavgdata.split()
+loadavgdata = loadavgline.split()
 load1 = loadavgdata[0]
 totalprocs = loadavgdata[3].split('/')[1]
 
@@ -112,10 +112,10 @@ gotnetprevdata = False
 if os.path.isfile(netprevfilename):
     try:
         fh = open(netprevfilename, "r")
-        netprevdata = fh.read()
+        netprevline = fh.read()
         fh.close()
 
-        netprevdata = netprevdata.split()
+        netprevdata = netprevline.split()
         netprevdata = [int(x) for x in netprevdata]
         prevrxb, prevrxp, prevtxb, prevtxp = netprevdata
         gotnetprevdata = True
@@ -184,10 +184,10 @@ gotdiskprevdata = False
 if os.path.isfile(diskprevfilename):
     try:
         fh = open(diskprevfilename, "r")
-        diskprevdata = fh.read()
+        diskprevline = fh.read()
         fh.close()
 
-        diskprevdata = diskprevdata.split()
+        diskprevdata = diskprevline.split()
         diskprevdata = [int(x) for x in diskprevdata]
 
         prevdiskreadc, prevdiskreads, prevdiskreadt, \
@@ -224,7 +224,7 @@ else:
                   currdiskioq))
     fh.close()
 
-    diskreadc, diskreads, diskreadt, diskwritec, diskwrites, diskwritet, diskioq = (0, 0, 0, 0, 0, 0, 0)
+    diskreadc, diskreads, diskreadt, diskwritec, diskwrites, diskwritet, diskioq = [str(x) for x in (0, 0, 0, 0, 0, 0, 0)]
 
 diskdata = "DISK %s %s %s %s %s %s %s" % \
     (diskreadc, diskreads, diskreadt,
@@ -239,26 +239,26 @@ fh.close()
 
 core = 0
 for line in lines:
-    line = line.split()
-    if re.match("MemTotal", line[0]):
-        core += int(line[1])
-    if re.match("MemFree", line[0]):
-        core -= int(line[1])
-    if re.match("Buffers", line[0]):
-        core -= int(line[1])
-    if re.match("Cached", line[0]):
-        core -= int(line[1])
+    data = line.split()
+    if re.match("MemTotal", data[0]):
+        core += int(data[1])
+    if re.match("MemFree", data[0]):
+        core -= int(data[1])
+    if re.match("Buffers", data[0]):
+        core -= int(data[1])
+    if re.match("Cached", data[0]):
+        core -= int(data[1])
 
 memdata = "CORE %s" % (core)
 
 # obtain count of logged in uses. Unfortunately I have to fork processes here
 users = subprocess.Popen(["/usr/bin/who", "-q"], stdout=subprocess.PIPE).communicate()[0]
-users = users.decode('utf8').strip()
-users = users.split()
-users = users[len(users)-1]
-users = users.split("=")[1]
+usersdata = users.decode('utf8').strip()
+usersdata = usersdata.split()
+usersdata = usersdata[len(usersdata)-1]
+userscount = usersdata.split("=")[1]
 
-userdata = "US %s" % (users)
+userdata = "US %s" % (userscount)
 
 # generate this row of data
 dataline = "host %s dat %s %s %s %s %s %s END\n" % (hostname, now, loadavgdata, netdata, diskdata, memdata, userdata)
