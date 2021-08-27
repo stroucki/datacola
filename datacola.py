@@ -229,9 +229,10 @@ memdata = "CORE %s" % (core)
 # obtain count of logged in uses. Unfortunately I have to fork processes here
 userscount = 0
 with subprocess.Popen(["/usr/bin/who", "-q"], stdout=subprocess.PIPE) as proc:
+    assert proc.stdout is not None
     users = proc.stdout.read()
     usersdata = users.decode('utf8').strip().split()
-    userscount = usersdata[-1].split("=")[1]
+    userscount = int(usersdata[-1].split("=")[1])
 
 userdata = "US %s" % (userscount)
 
