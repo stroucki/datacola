@@ -31,7 +31,7 @@ bufferfilename = '/var/run/datacola-data'
 storagefilebase = '/root/datacola/'
 # directory to hold data row archives
 
-def nonneg(value):
+def nonneg(value: int) -> int:
     # Force value to be 0 or greater, in case of overflow
     # or other problem
     if value < 0:
@@ -161,11 +161,11 @@ currdiskreadc, currdiskreads, currdiskreadt, \
     currdiskioq = (0, 0, 0, 0, 0, 0, 0)
 
 for line in lines:
-    major, minor, name, \
-        diskreadc, diskreadm, diskreads, diskreadt, \
+    major, minor, name, data = line.split(4)
+    diskreadc, diskreadm, diskreads, diskreadt, \
         diskwritec, diskwritem, diskwrites, diskwritet, \
         diskioq, diskiot, diskiotw, \
-        _, _, _, _ = line.split()
+        _, _, _, _ = [int(x) for x in data.split()]
 
     # I think empty 4 least significant bits signify whole-disk
     if int(minor) & 15 == 0:
