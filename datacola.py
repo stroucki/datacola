@@ -161,11 +161,12 @@ currdiskreadc, currdiskreads, currdiskreadt, \
     currdiskioq = (0, 0, 0, 0, 0, 0, 0)
 
 for line in lines:
-    major, minor, name, data = line.split(4)
+    major, minor, name, data = line.split(maxsplit = 4)
     diskreadc, diskreadm, diskreads, diskreadt, \
         diskwritec, diskwritem, diskwrites, diskwritet, \
         diskioq, diskiot, diskiotw, \
         _, _, _, _ = [int(x) for x in data.split()]
+    del data
 
     # I think empty 4 least significant bits signify whole-disk
     if int(minor) & 15 == 0:
@@ -222,7 +223,7 @@ else:
                   currdiskioq))
     fh.close()
 
-    diskreadc, diskreads, diskreadt, diskwritec, diskwrites, diskwritet, diskioq = [str(x) for x in (0, 0, 0, 0, 0, 0, 0)]
+    diskreadc, diskreads, diskreadt, diskwritec, diskwrites, diskwritet, diskioq = (0, 0, 0, 0, 0, 0, 0)
 
 diskdata = "DISK %s %s %s %s %s %s %s" % \
     (diskreadc, diskreads, diskreadt,
