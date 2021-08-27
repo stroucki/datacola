@@ -144,7 +144,7 @@ currdiskreadc, currdiskreads, currdiskreadt, \
     currdiskioq = (0, 0, 0, 0, 0, 0, 0)
 
 for line in lines:
-    major, minor, name, data1 = line.split(maxsplit = 4)
+    major, minor, name, data1 = line.split(maxsplit = 3)
     diskreadc, diskreadm, diskreads, diskreadt, \
         diskwritec, diskwritem, diskwrites, diskwritet, \
         diskioq, diskiot, diskiotw, \
