@@ -80,7 +80,7 @@ loadavgdata = loadavgline.split()
 load1 = loadavgdata[0]
 totalprocs = loadavgdata[3].split('/')[1]
 
-loadavgdata = "AN %s %s" % (load1, totalprocs)
+loadavgout = "AN %s %s" % (load1, totalprocs)
 
 # obtain network statistics
 # We want the difference over the previous measurement of the following:-
@@ -115,8 +115,7 @@ if os.path.isfile(netprevfilename):
         netprevline = fh.read()
         fh.close()
 
-        netprevdata = netprevline.split()
-        netprevdata = [int(x) for x in netprevdata]
+        netprevdata = [int(x) for x in netprevline.split()]
         prevrxb, prevrxp, prevtxb, prevtxp = netprevdata
         gotnetprevdata = True
     except:
@@ -187,12 +186,11 @@ if os.path.isfile(diskprevfilename):
         diskprevline = fh.read()
         fh.close()
 
-        diskprevdata = diskprevline.split()
-        diskprevdata = [int(x) for x in diskprevdata]
+        diskprevdata = [int(x) for x in diskprevline.split()]
 
         prevdiskreadc, prevdiskreads, prevdiskreadt, \
             prevdiskwritec, prevdiskwrites, prevdiskwritet, \
-            prevdiskioq = diskprevdata
+            prevdiskioq = [int(x) for x in diskprevdata]
         gotdiskprevdata = True
 
     except:
@@ -253,15 +251,14 @@ memdata = "CORE %s" % (core)
 
 # obtain count of logged in uses. Unfortunately I have to fork processes here
 users = subprocess.Popen(["/usr/bin/who", "-q"], stdout=subprocess.PIPE).communicate()[0]
-usersdata = users.decode('utf8').strip()
-usersdata = usersdata.split()
+usersdata = users.decode('utf8').strip().split()
 usersdata = usersdata[len(usersdata)-1]
 userscount = usersdata.split("=")[1]
 
 userdata = "US %s" % (userscount)
 
 # generate this row of data
-dataline = "host %s dat %s %s %s %s %s %s END\n" % (hostname, now, loadavgdata, netdata, diskdata, memdata, userdata)
+dataline = "host %s dat %s %s %s %s %s %s END\n" % (hostname, now, loadavgout, netdata, diskdata, memdata, userdata)
 
 # read in the buffer of data rows
 linecount = 0
