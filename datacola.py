@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # datacola.py: a data collecting script
 # this can be run out of cron
@@ -13,20 +13,20 @@ import platform
 import re
 import subprocess
 
-bufsizefilename = '/var/run/rten'
+bufsizefilename = '/run/rten'
 # filename to store number of records to buffer before writing
 # to permanent storage
 loadavgfilename = '/proc/loadavg'
 # filename to read load average data from
 netfilename = '/proc/net/dev'
 # filename to read network interface stats from
-netprevfilename = '/var/run/datacola-net'
+netprevfilename = '/run/datacola-net'
 # filename to store previous network stats in
 diskfilename = '/proc/diskstats'
 # filename to read disk stats from
-diskprevfilename = '/var/run/datacola-disk'
+diskprevfilename = '/run/datacola-disk'
 # filename to store previous disk stats in
-bufferfilename = '/var/run/datacola-data'
+bufferfilename = '/run/datacola-data'
 # filename to hold data rows until being moved out
 storagefilebase = '/root/datacola/'
 # directory to hold data row archives
@@ -148,7 +148,7 @@ for line in lines:
     diskreadc, diskreadm, diskreads, diskreadt, \
         diskwritec, diskwritem, diskwrites, diskwritet, \
         diskioq, diskiot, diskiotw, \
-        _, _, _, _ = [int(x) for x in data1.split()]
+        _, _, _, _, _, _ = [int(x) for x in data1.split()]
 
     # I think empty 4 least significant bits signify whole-disk
     if int(minor) & 15 == 0:
